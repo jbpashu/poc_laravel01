@@ -1,0 +1,64 @@
+we have phpmyadmin available per environment as of now
+staging one is at https://staging.api.v3.spherewms.com/_phpmyadmin/
+for dynamic environments it will be available at https://${CI_ENV_SLUG}}.api.v3.spherewms.com/_phpmyadmin respectively
+default http and mysql credentials can be looked up in .gitlab-ci.yml at repo root
+http:
+	user: v3phpmyadmin
+	pass: cTTz7Jw*39
+	mysql user: v3
+	mysql pass: secret
+
+
+Important Notes:
+
+In UPC code when country code included it would be EAN.
+Commodity code - for international shippments there must be a commodity code
+
+1. Prepare Manual installations steps and include it in wiki
+2. Work on importing all the other items.
+
+
+docker-compose exec api_php php artisan migrate:fresh --seed
+docker-compose exec api_php php artisan db:seed
+php artisan make:seeder UomLevelsSeeder
+php artisan make:model UomLevels --migration
+php artisan route:list
+php artisan make:provider ImportV1ItemMasterServiceProvider
+php artisan make:controller SupplierController --model=Supplier --resource
+php artisan make:resource SupplierCollection -c
+
+php artisan make:resource OrderCollection -c
+php artisan make:resource OrderResource -c
+
+php artisan migrate:refresh --path=/database/migrations/2020_07_22_104347_create_shippings_table.php
+
+
+docker-compose exec api_php php artisan import:itemmaster
+
+ARTISAN_ARGS
+
+stop all containers:
+docker kill $(docker ps -q)
+
+remove all containers
+docker rm $(docker ps -a -q)
+
+remove all docker images
+docker rmi $(docker images -q)
+
+
+To go inside docker container
+
+docker exec -it <container name> bash
+
+
+Step 1: install mysql
+Step 2: Log into mysql and create DB and user using following steps:
+	2.1: CREATE DATABSE api_v3;
+	2.2: CREATE USER 'api_v3'@'localhost' IDENTIFIED BY 'nopassword';
+	2.3: GRANT ALL PRIVILEGES ON api_v3.* TO 'api_v3'@'localhost';
+Step 3: docker-compose up --build -d
+Step 4: cd into api folder
+Step 5: Run migrations for first DB using php artisan migrate:fresh --seed --database="mysql"
+Step 6: Run migrations for second DB using php artisan migrate:fresh --seed --database="mysql2"
+Step 7: run php artisan serve and access application from given url

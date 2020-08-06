@@ -1,0 +1,97 @@
+version: '3.4'
+
+services:
+  mysql1:
+    image: mariadb:10.3
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-nopassword}
+      - MYSQL_DATABASE=api_v3
+      - MYSQL_USER=api_v3
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-nopassword}
+    ports:
+      - 3300:3306
+    volumes:
+      - mysql-data:/var/lib/mysql:rw,delegated
+
+  mysql2:
+    image: mariadb:10.3
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-nopassword}
+      - MYSQL_DATABASE=api_v3
+      - MYSQL_USER=api_v3
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-nopassword}
+    ports:
+      - 3301:33006
+    volumes:
+      - mysql-data1:/var/lib/mysql:rw,delegated
+
+  api_composer_multi:
+    container_name: api_composer_multi
+    build:
+      context: api
+      target: composer
+    volumes:
+      - ./api/composer.json:/app/composer.json
+      - ./api/composer.lock:/app/composer.lock
+      - ./api/vendor:/app/vendor
+
+  # api_frontend:
+  #   container_name: api_frontend
+  #   build:
+  #     context: api
+  #     target: frontend
+
+  api_php_multi_con:
+    container_name: api_php_multi_con
+    build:
+      context: api
+      target: php
+    image: spherewms/v3-api-php
+    env_file:
+      - api/.docker.env
+    environment:
+      - DB_HOST=mysql
+      - DB_DATABASE=api_v3
+      - DB_USERNAME=api_v3
+      - DB_PASSWORD=nopassword
+      - DB_CONNECTION=mysql
+      - APP_ENV=local
+      - APP_KEY=base64:UDj2moYcGaT2en0rJ9DosIZfmpSZWEhaksWyswN1lCk=
+      - LOG_CHANNEL=stderr
+      - APP_DEBUG=true
+      - APP_URL=http://localhost:8080/
+      - APP_NAME=V3
+#    depends_on:
+#      - mysql
+    volumes:
+      - ./api:/var/www/html:cached
+      - storage:/var/www/html/storage
+
+  nginx:
+    container_name: api_nginx_multi_con
+    image: spherewms/v3-api-nginx
+    build:
+      context: api
+      target: nginx
+      args:
+        UPSTREAM: api_php_multi_con
+    ports:
+      - 8080:80
+    depends_on:
+      - api_php_multi_con
+
+  # web:
+  #   container_name: web_nginx
+  #   image: spherewms/v3-web
+  #   build:
+  #     context: web
+  #     target: web
+  #   environment:
+  #     - API_URL=http://localhost:8080/
+  #   ports:
+  #     - 81:80
+
+volumes:
+  mysql-data:
+  mysql-data1:
+  storage:

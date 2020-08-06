@@ -1,0 +1,1 @@
+Place SSL Certificates here. Reference them with Helm command

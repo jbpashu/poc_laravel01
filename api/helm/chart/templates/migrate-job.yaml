@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "api.fullname" . }}-migrate
+  annotations:
+    "helm.sh/hook": post-install,pre-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 300
+  ttlSecondsAfterFinished: 0
+  template:
+    metadata:
+      labels:
+        {{- include "api.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: {{ template "api.regcred.fullname" . }}
+      restartPolicy: Never
+      containers:
+        - name: {{ include "api.fullname" . }}-migrate
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/www/html/storage/app/public
+              name: public-storage
+              {{- if eq .Values.publicStorage.prod false }}
+              subPathExpr: $(FULLNAME)
+              {{- end }}
+          env:
+            {{- range $key, $value := .Values.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: DB_HOST
+              value: {{ .Values.dbHost }}
+            - name: FULLNAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels['app.kubernetes.io/name']
+          command:
+            - php
+            - artisan
+            - migrate
+      volumes:
+        - name: public-storage
+        {{- if .Values.publicStorage.nfs }}
+          nfs:
+            server: {{ .Values.publicStorage.nfs.server }}
+            path: {{ .Values.publicStorage.nfs.path }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}

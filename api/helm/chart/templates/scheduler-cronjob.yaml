@@ -1,0 +1,61 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "api.fullname" . }}-cron
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  startingDeadlineSeconds: 30
+  successfulJobsHistoryLimit: 3
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            {{- include "api.selectorLabels" . | nindent 12 }}
+        spec:
+          imagePullSecrets:
+            - name: {{ template "api.regcred.fullname" . }}
+          restartPolicy: Never
+          containers:
+            - name: {{ include "api.fullname" . }}-artisan-schedule
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              env:
+                {{- range $key, $value := .Values.extraEnv }}
+                - name: {{ $key }}
+                  value: {{ $value | quote }}
+                {{- end }}
+                - name: DB_HOST
+                  value: {{ .Values.dbHost }}
+                - name: FULLNAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.labels['app.kubernetes.io/name']
+              command:
+                - /bin/sh
+                - -c
+                - php artisan schedule:run && while pgrep php > /dev/null; do sleep 1; done
+              volumeMounts:
+                - mountPath: /var/www/html/storage/app/public
+                  name: public-storage
+                  {{- if eq .Values.publicStorage.prod false }}
+                  subPathExpr: $(FULLNAME)
+                  {{- end }}
+          volumes:
+            - name: public-storage
+            {{- if .Values.publicStorage.nfs }}
+              nfs:
+                server: {{ .Values.publicStorage.nfs.server }}
+                path: {{ .Values.publicStorage.nfs.path }}
+            {{- else }}
+              emptyDir: {}
+            {{- end }}
