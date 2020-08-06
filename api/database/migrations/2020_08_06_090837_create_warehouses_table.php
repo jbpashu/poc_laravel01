@@ -15,6 +15,8 @@ class CreateWarehousesTable extends Migration
     {
         Schema::create('warehouses', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->bigInteger('manager_id');
             $table->timestamps();
         });
     }
