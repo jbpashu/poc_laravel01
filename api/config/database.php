@@ -63,7 +63,7 @@ return [
             ]) : [],
         ],
 
-        '3pl1_w1' => [
+        '3pl' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST_LOCAL', '127.0.0.1'),
