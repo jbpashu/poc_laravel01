@@ -14,12 +14,12 @@ class ContextController extends Controller
      */
     public function getContext(Request $request)
     {
-        $user = User::where('name', $request->name)->get(['id', 'name', 'email','secret_token'])->first();
+        $user = User::where('name', $request->name)->get(['id', 'name', 'email','secret_token', 'created_at', 'updated_at'])->first();
 
         if (is_null($user)) {
             return response()->json(['message' => 'Not found'], 404);
         } else {
-            return response()->json(['data' => $user], 200);
+            return response()->json(['user' => $user], 200);
         }
     }
 }

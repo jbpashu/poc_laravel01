@@ -19,17 +19,17 @@ class Account1Seeder extends Seeder
 
         // Inserting users
         DB::table('users')->insert([
-            ['name' => 'superadmin', 'email' => 'superadmin@wms.com', 'account_id' => $account->id, 'role' => 'superadmin' , 'secret_token' => Str::random(8), 'password' => 'password']
+            ['name' => 'superadmin', 'email' => 'superadmin@wms.com', 'account_id' => $account->id, 'role' => 'superadmin' , 'secret_token' => Str::random(8), 'password' => 'password',  'created_at' => date('d-m-y h:i:s'), 'updated_at' => date('d-m-y h:i:s')]
         ]);
 
         // creating warehouse 01 ,it's manager and clients for 3pl1
-        $W01M013pl1Id = User::insertGetId( ['name' => '3pl1_W01_M01', 'email' => '3pl1w01m01@wms.com', 'account_id' => $account->id, 'role' => 'warehouse_manager' , 'secret_token' =>  Str::random(8), 'password' => 'password']);
+        $W01M013pl1Id = User::insertGetId( ['name' => '3pl1_W01_M01', 'email' => '3pl1w01m01@wms.com', 'account_id' => $account->id, 'role' => 'warehouse_manager' , 'secret_token' =>  Str::random(8), 'password' => 'password',  'created_at' => date('d-m-y h:i:s'), 'updated_at' => date('d-m-y h:i:s')]);
         $w13pl1Id = Warehouse::insertGetId([
             "name" => "3PL1_W01",
             "manager_id" => $W01M013pl1Id
         ]);
 
-        $W01C013pl1Id = User::insertGetId(['name' => '3pl1_W01_C01', 'email' =>'3pl1w01c01@wms.com', 'account_id' => $account->id, 'role' => 'client' , 'secret_token' =>  Str::random(8), 'password' => 'password']);
+        $W01C013pl1Id = User::insertGetId(['name' => '3pl1_W01_C01', 'email' =>'3pl1w01c01@wms.com', 'account_id' => $account->id, 'role' => 'client' , 'secret_token' =>  Str::random(8), 'password' => 'password',  'created_at' => date('d-m-y h:i:s'), 'updated_at' => date('d-m-y h:i:s')]);
 
         $W01Client1Id = Client::insertGetId([
             "name" => "3pl1_W01_C01",
@@ -50,7 +50,7 @@ class Account1Seeder extends Seeder
             ],
         ]);
 
-        $W01C023pl1Id = User::insertGetId(['name' => '3pl1_W01_C02', 'email' =>'3pl1w01c02@wms.com', 'account_id' => $account->id, 'role' => 'client' , 'secret_token' =>  Str::random(8), 'password' => 'password']);
+        $W01C023pl1Id = User::insertGetId(['name' => '3pl1_W01_C02', 'email' =>'3pl1w01c02@wms.com', 'account_id' => $account->id, 'role' => 'client' , 'secret_token' =>  Str::random(8), 'password' => 'password',  'created_at' => date('d-m-y h:i:s'), 'updated_at' => date('d-m-y h:i:s')]);
 
         $W01Client2Id = Client::insertGetId([
             "name" => "3pl1_W01_C02",
@@ -74,14 +74,14 @@ class Account1Seeder extends Seeder
 
         
         // creating warehouse 11 and manager for 3pl1
-        $W11M113pl1Id = User::insertGetId( ['name' => '3pl1_W11_M11', 'email' =>'3pl1w11m11@wms.com', 'account_id' => $account->id, 'role' => 'warehouse_manager' , 'secret_token' =>  Str::random(8), 'password' => 'password']);
+        $W11M113pl1Id = User::insertGetId( ['name' => '3pl1_W11_M11', 'email' =>'3pl1w11m11@wms.com', 'account_id' => $account->id, 'role' => 'warehouse_manager' , 'secret_token' =>  Str::random(8), 'password' => 'password',  'created_at' => date('d-m-y h:i:s'), 'updated_at' => date('d-m-y h:i:s')]);
 
         $w23pl1Id = Warehouse::insertGetId([
             "name" => "3PL1_W11",
             "manager_id" => $W11M113pl1Id
         ]);
 
-        $W11C013pl1Id = User::insertGetId(['name' => '3pl1_W11_C01', 'email' =>'3pl1w11c01@wms.com', 'account_id' => $account->id, 'role' => 'client' , 'secret_token' =>  Str::random(8), 'password' => 'password']);
+        $W11C013pl1Id = User::insertGetId(['name' => '3pl1_W11_C01', 'email' =>'3pl1w11c01@wms.com', 'account_id' => $account->id, 'role' => 'client' , 'secret_token' =>  Str::random(8), 'password' => 'password',  'created_at' => date('d-m-y h:i:s'), 'updated_at' => date('d-m-y h:i:s')]);
 
         $W11Client1Id = Client::insertGetId([
             "name" => "3pl1_W11_C01",
@@ -103,7 +103,7 @@ class Account1Seeder extends Seeder
         ]);
 
 
-        $W11C023pl1Id = User::insertGetId(['name' => '3pl1_W11_C02', 'email' =>'3pl1w11c02@wms.com', 'account_id' => $account->id, 'role' => 'client' , 'secret_token' =>  Str::random(8), 'password' => 'password']);
+        $W11C023pl1Id = User::insertGetId(['name' => '3pl1_W11_C02', 'email' =>'3pl1w11c02@wms.com', 'account_id' => $account->id, 'role' => 'client' , 'secret_token' =>  Str::random(8), 'password' => 'password',  'created_at' => date('d-m-y h:i:s'), 'updated_at' => date('d-m-y h:i:s')]);
 
         $W11Client2Id = Client::insertGetId([
             "name" => "3pl1_W11_C02",
