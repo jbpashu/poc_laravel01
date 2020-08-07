@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
  */
 Route::resources([
     'orders' => 'OrderController',
-    'clients' => 'ClientController',
     'items' => 'ItemController',
-    'suppliers'=> 'SupplierController'
 ]);
+
+Route::get('/context_service', 'ContextController@getContext');
